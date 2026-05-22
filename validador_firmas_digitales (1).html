@@ -1,503 +1,572 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>HashSign — Validador de Firmas Digitales</title>
-<link rel="preconnect" href="https://fonts.googleapis.com"/>
-<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet"/>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>HashSign Neon Edition</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;800&family=Rajdhani:wght@300;500;700&display=swap" rel="stylesheet">
+
 <style>
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
 
 :root{
-  --bg:#080b12;
-  --surface:#0f1320;
-  --surface2:#161c2e;
-  --border:#1e2640;
-  --border2:#2a3356;
-  --accent:#00e5a0;
-  --accent-dim:rgba(0,229,160,.12);
-  --accent-glow:rgba(0,229,160,.25);
-  --blue:#3b82f6;
-  --blue-dim:rgba(59,130,246,.12);
-  --danger:#f43f5e;
-  --danger-dim:rgba(244,63,94,.12);
-  --text:#e2e8f8;
-  --muted:#5a6a8a;
-  --mono:'DM Mono',monospace;
-  --sans:'Syne',sans-serif;
+    --bg:#050816;
+    --panel:#0d1326;
+    --panel2:#111935;
+    --accent:#00ffb3;
+    --blue:#4da3ff;
+    --danger:#ff4d6d;
+    --text:#eef3ff;
+    --muted:#7d8bb3;
+    --border:#1f2b4d;
 }
 
-html{scroll-behavior:smooth}
-body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
-
-/* grid bg */
-body::before{
-  content:'';position:fixed;inset:0;z-index:0;
-  background-image:linear-gradient(rgba(0,229,160,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(0,229,160,.025) 1px,transparent 1px);
-  background-size:48px 48px;pointer-events:none;
+body{
+    min-height:100vh;
+    background:
+        radial-gradient(circle at top,#13203f 0%,#050816 60%);
+    color:var(--text);
+    font-family:'Rajdhani',sans-serif;
+    overflow-x:hidden;
 }
 
-/* NAV */
-nav{
-  position:sticky;top:0;z-index:100;
-  display:flex;align-items:center;justify-content:space-between;
-  padding:0 2rem;height:60px;
-  background:rgba(8,11,18,.9);backdrop-filter:blur(16px);
-  border-bottom:1px solid var(--border);
+canvas{
+    position:fixed;
+    inset:0;
+    z-index:-1;
 }
-.logo{font-size:1.2rem;font-weight:800;letter-spacing:-.03em;display:flex;align-items:center;gap:6px}
-.logo-hash{color:var(--accent)}
-.logo-sign{color:var(--text)}
-.logo-dot{width:6px;height:6px;border-radius:50%;background:var(--accent);animation:pulse 2s infinite}
-@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(.8)}}
-.nav-right{display:flex;align-items:center;gap:10px}
-.nav-pill{
-  font-family:var(--mono);font-size:.65rem;letter-spacing:.08em;
-  padding:.25rem .7rem;border-radius:999px;
-  background:var(--accent-dim);border:1px solid rgba(0,229,160,.3);color:var(--accent);
-}
-.nav-team{font-family:var(--mono);font-size:.65rem;color:var(--muted)}
 
-/* HERO */
-.hero{
-  position:relative;z-index:1;
-  padding:4rem 2rem 2.5rem;max-width:800px;margin:0 auto;text-align:center;
+.container{
+    max-width:900px;
+    margin:auto;
+    padding:40px 20px;
 }
-.hero-eyebrow{
-  display:inline-block;
-  font-family:var(--mono);font-size:.7rem;letter-spacing:.15em;text-transform:uppercase;
-  color:var(--blue);background:var(--blue-dim);border:1px solid rgba(59,130,246,.25);
-  border-radius:4px;padding:.3rem .9rem;margin-bottom:1.5rem;
-}
-.hero h1{
-  font-size:clamp(2rem,5vw,3.2rem);font-weight:800;line-height:1.1;letter-spacing:-.04em;
-  margin-bottom:.8rem;
-}
-.hero h1 span{
-  background:linear-gradient(90deg,var(--accent) 0%,#00c9e5 100%);
-  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
-}
-.hero p{font-family:var(--mono);font-size:.82rem;color:var(--muted);line-height:1.8;max-width:500px;margin:0 auto 2rem}
 
-/* MAIN */
-main{position:relative;z-index:1;max-width:820px;margin:0 auto;padding:0 1.5rem 5rem}
-
-/* TABS */
-.tabs-bar{
-  display:flex;gap:4px;
-  background:var(--surface);border:1px solid var(--border);
-  border-radius:14px;padding:5px;margin-bottom:1.5rem;
+.title{
+    text-align:center;
+    margin-bottom:40px;
 }
-.tab-btn{
-  flex:1;font-family:var(--sans);font-size:.82rem;font-weight:600;
-  padding:.65rem 1rem;border:none;border-radius:10px;
-  cursor:pointer;transition:all .2s;
-  background:transparent;color:var(--muted);
+
+.title h1{
+    font-family:'Orbitron',sans-serif;
+    font-size:4rem;
+    letter-spacing:4px;
+    color:white;
+    text-shadow:
+        0 0 10px var(--accent),
+        0 0 30px var(--accent);
 }
-.tab-btn:hover{color:var(--text);background:var(--surface2)}
-.tab-btn.active{background:linear-gradient(135deg,#0d2a1e,#0d2030);color:var(--accent);box-shadow:inset 0 0 0 1px rgba(0,229,160,.3)}
 
-/* PANELS */
-.panel{display:none;animation:fadeUp .28s ease}
-.panel.active{display:block}
-@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.title span{
+    color:var(--accent);
+}
 
-/* CARD */
+.title p{
+    margin-top:10px;
+    color:var(--muted);
+    font-size:1.2rem;
+}
+
 .card{
-  background:var(--surface);border:1px solid var(--border);
-  border-radius:18px;padding:1.75rem;margin-bottom:1rem;
+    background:rgba(13,19,38,.75);
+    border:1px solid var(--border);
+    backdrop-filter:blur(15px);
+    border-radius:22px;
+    padding:28px;
+    margin-bottom:25px;
+    box-shadow:
+        0 0 20px rgba(0,255,179,.08);
 }
-.card-header{
-  display:flex;align-items:center;gap:8px;
-  font-family:var(--mono);font-size:.68rem;letter-spacing:.12em;text-transform:uppercase;
-  color:var(--muted);margin-bottom:1.5rem;
-}
-.card-header::before{content:'';width:7px;height:7px;border-radius:50%;background:var(--accent)}
 
-/* FORM */
+.card h2{
+    margin-bottom:20px;
+    color:var(--accent);
+    font-size:1.7rem;
+}
+
 label{
-  display:block;font-family:var(--mono);font-size:.72rem;
-  color:var(--muted);letter-spacing:.08em;text-transform:uppercase;
-  margin-bottom:7px;margin-top:1.1rem;
+    display:block;
+    margin:18px 0 8px;
+    color:var(--muted);
+    font-size:.95rem;
 }
-label:first-of-type{margin-top:0}
-textarea,input[type=text],input[type=password]{
-  width:100%;font-family:var(--mono);font-size:.83rem;
-  background:var(--bg);border:1px solid var(--border2);border-radius:10px;
-  color:var(--text);padding:.75rem 1rem;outline:none;resize:vertical;
-  transition:border-color .2s,box-shadow .2s;
-}
-textarea:focus,input:focus{
-  border-color:var(--accent);
-  box-shadow:0 0 0 3px var(--accent-dim);
-}
-textarea{min-height:96px}
 
-/* ALGO */
-.algo-row{display:flex;gap:6px;margin-top:7px}
-.algo-btn{
-  flex:1;font-family:var(--mono);font-size:.75rem;
-  padding:.55rem;border:1px solid var(--border2);border-radius:8px;
-  background:var(--bg);color:var(--muted);cursor:pointer;transition:all .18s;
+input{
+    width:100%;
+    padding:15px;
+    border-radius:14px;
+    border:1px solid var(--border);
+    background:#07101f;
+    color:white;
+    font-size:1rem;
+    outline:none;
+    transition:.3s;
 }
-.algo-btn:hover{color:var(--text);border-color:var(--border)}
-.algo-btn.active{border-color:var(--blue);color:var(--blue);background:var(--blue-dim)}
 
-/* BUTTON */
-.btn{
-  margin-top:1.4rem;width:100%;
-  font-family:var(--sans);font-size:.9rem;font-weight:700;letter-spacing:.04em;
-  padding:.85rem 2rem;border:none;border-radius:11px;
-  background:linear-gradient(135deg,var(--accent),#00c98a);
-  color:#061810;cursor:pointer;transition:all .2s;
+input:focus{
+    border-color:var(--accent);
+    box-shadow:0 0 15px rgba(0,255,179,.3);
 }
-.btn:hover{transform:translateY(-2px);box-shadow:0 10px 28px var(--accent-glow)}
-.btn:active{transform:translateY(0)}
-.btn:disabled{opacity:.35;cursor:not-allowed;transform:none;box-shadow:none}
 
-/* ERROR */
-.errmsg{
-  margin-top:10px;padding:.75rem 1rem;
-  background:var(--danger-dim);border:1px solid rgba(244,63,94,.3);
-  border-radius:8px;font-family:var(--mono);font-size:.78rem;color:var(--danger);
-  display:none;
+button{
+    width:100%;
+    margin-top:20px;
+    padding:15px;
+    border:none;
+    border-radius:14px;
+    cursor:pointer;
+    background:
+        linear-gradient(135deg,var(--accent),#00d494);
+    color:#03140f;
+    font-weight:bold;
+    font-size:1rem;
+    transition:.3s;
 }
-.errmsg.show{display:block}
 
-/* RESULT */
+button:hover{
+    transform:translateY(-2px);
+    box-shadow:
+        0 0 20px rgba(0,255,179,.4);
+}
+
 .result{
-  margin-top:1rem;background:#060910;
-  border:1px solid var(--border);border-radius:14px;
-  overflow:hidden;display:none;animation:fadeUp .28s ease;
+    margin-top:20px;
+    padding:20px;
+    border-radius:14px;
+    background:#050b16;
+    border:1px solid var(--border);
+    display:none;
+    word-break:break-word;
 }
-.result.show{display:block}
-.result-hdr{
-  display:flex;align-items:center;justify-content:space-between;
-  padding:.65rem 1.1rem;background:var(--surface);
-  border-bottom:1px solid var(--border);
+
+.result.show{
+    display:block;
+    animation:fade .5s ease;
 }
-.result-hdr-label{font-family:var(--mono);font-size:.68rem;color:var(--muted);letter-spacing:.1em;text-transform:uppercase}
-.badge{font-family:var(--mono);font-size:.68rem;font-weight:500;padding:.2rem .65rem;border-radius:999px;border:1px solid}
-.badge-ok{background:rgba(0,229,160,.12);color:var(--accent);border-color:rgba(0,229,160,.3)}
-.badge-fail{background:var(--danger-dim);color:var(--danger);border-color:rgba(244,63,94,.3)}
-.result-body{padding:1rem 1.1rem}
-.rrow{display:flex;gap:10px;align-items:flex-start;margin-bottom:.85rem}
-.rrow:last-child{margin-bottom:0}
-.rkey{font-family:var(--mono);font-size:.68rem;color:var(--muted);letter-spacing:.07em;text-transform:uppercase;min-width:105px;flex-shrink:0;padding-top:2px}
-.rval{font-family:var(--mono);font-size:.8rem;color:var(--text);word-break:break-all;line-height:1.65;flex:1}
-.rval.ok{color:var(--accent)}
-.rval.info{color:var(--blue)}
-.rval.fail{color:var(--danger)}
+
+@keyframes fade{
+    from{
+        opacity:0;
+        transform:translateY(10px);
+    }
+    to{
+        opacity:1;
+        transform:translateY(0);
+    }
+}
+
+.ok{
+    color:var(--accent);
+}
+
+.fail{
+    color:var(--danger);
+}
+
 .copy-btn{
-  font-family:var(--mono);font-size:.68rem;
-  padding:.2rem .55rem;border:1px solid var(--border2);border-radius:6px;
-  background:transparent;color:var(--muted);cursor:pointer;transition:all .15s;flex-shrink:0;
-}
-.copy-btn:hover{border-color:var(--accent);color:var(--accent)}
-
-/* VERDICT */
-.verdict{
-  display:flex;align-items:center;gap:12px;
-  padding:1rem 1.1rem;border-radius:10px;margin-bottom:1rem;
-}
-.verdict.ok{background:rgba(0,229,160,.07);border:1px solid rgba(0,229,160,.22)}
-.verdict.fail{background:var(--danger-dim);border:1px solid rgba(244,63,94,.22)}
-.verdict-icon{font-size:1.5rem}
-.verdict-text{font-size:.88rem;font-weight:600;line-height:1.4}
-.verdict.ok .verdict-text{color:var(--accent)}
-.verdict.fail .verdict-text{color:var(--danger)}
-
-/* INFO */
-.infobox{
-  margin-top:1rem;padding:.9rem 1.1rem;
-  background:rgba(59,130,246,.06);border:1px solid rgba(59,130,246,.2);
-  border-radius:10px;font-family:var(--mono);font-size:.77rem;
-  color:rgba(147,197,253,.8);line-height:1.7;
-}
-.infobox b{color:var(--text)}
-
-/* FOOTER */
-footer{
-  position:relative;z-index:1;text-align:center;
-  padding:1.5rem;border-top:1px solid var(--border);
-  font-family:var(--mono);font-size:.68rem;color:var(--muted);
+    margin-top:15px;
+    background:var(--panel2);
+    color:white;
 }
 
-/* SPINNER */
-.spin{
-  display:inline-block;width:13px;height:13px;
-  border:2px solid rgba(6,24,16,.3);border-top-color:#061810;
-  border-radius:50%;animation:rot .55s linear infinite;
-  vertical-align:middle;margin-right:5px;
+.err{
+    margin-top:10px;
+    color:var(--danger);
 }
-@keyframes rot{to{transform:rotate(360deg)}}
+
+.footer{
+    text-align:center;
+    margin-top:30px;
+    color:var(--muted);
+}
+
 </style>
 </head>
+
 <body>
 
-<nav>
-  <div class="logo">
-    <div class="logo-dot"></div>
-    <span class="logo-hash">Hash</span><span class="logo-sign">Sign</span>
-  </div>
-  <div class="nav-right">
-    <span class="nav-pill">HMAC-SHA256</span>
-    <span class="nav-team">Derecho Informático</span>
-  </div>
-</nav>
+<canvas id="bg"></canvas>
 
-<section class="hero">
-  <div class="hero-eyebrow">Seguridad Jurídica Digital</div>
-  <h1>Validador de<br/><span>Firmas Digitales</span></h1>
-  <p>Genera hashes criptográficos, firma documentos con HMAC‑SHA256 y verifica su autenticidad e integridad.</p>
-</section>
+<div class="container">
 
-<main>
-  <div class="tabs-bar">
-    <button class="tab-btn active" onclick="switchTab('hash',this)">🔐 Generar Hash</button>
-    <button class="tab-btn" onclick="switchTab('firmar',this)">✍️ Firmar</button>
-    <button class="tab-btn" onclick="switchTab('verificar',this)">✅ Verificar</button>
-  </div>
+    <div class="title">
+        <h1>Hash<span>Sign</span></h1>
+        <p>Validador de Integridad y Firma Criptográfica</p>
+    </div>
 
-  <!-- ── HASH ── -->
-  <div id="panel-hash" class="panel active">
+    <!-- HASH -->
     <div class="card">
-      <div class="card-header">Generar Hash Criptográfico</div>
-      <label>Mensaje o documento</label>
-      <textarea id="h-msg" placeholder="Escribe el texto que deseas hashear..."></textarea>
-      <label>Algoritmo</label>
-      <div class="algo-row">
-        <button class="algo-btn active" onclick="setAlgo(this,'SHA-256')">SHA-256</button>
-        <button class="algo-btn" onclick="setAlgo(this,'SHA-512')">SHA-512</button>
-      </div>
-      <input type="hidden" id="h-algo" value="SHA-256"/>
-      <button class="btn" id="h-btn" onclick="doHash()">Calcular Hash</button>
-      <div class="errmsg" id="h-err"></div>
-    </div>
-    <div class="result" id="h-res">
-      <div class="result-hdr">
-        <span class="result-hdr-label">Resultado</span>
-        <span class="badge badge-ok">Calculado</span>
-      </div>
-      <div class="result-body">
-        <div class="rrow"><span class="rkey">Algoritmo</span><span class="rval info" id="hr-algo"></span></div>
-        <div class="rrow"><span class="rkey">Longitud</span><span class="rval" id="hr-bits"></span></div>
-        <div class="rrow" style="align-items:center">
-          <span class="rkey">Hash</span>
-          <span class="rval ok" id="hr-hash" style="flex:1"></span>
-          <button class="copy-btn" onclick="copyText('hr-hash',this)">copiar</button>
-        </div>
-        <div class="rrow"><span class="rkey">Generado</span><span class="rval" id="hr-ts"></span></div>
-      </div>
-    </div>
-    <div class="infobox"><b>¿Qué es un hash?</b><br/>Transforma cualquier texto en una huella digital de longitud fija. Cualquier cambio mínimo produce un hash completamente diferente — así se detectan alteraciones en documentos legales.</div>
-  </div>
 
-  <!-- ── FIRMAR ── -->
-  <div id="panel-firmar" class="panel">
+        <h2>🔐 Generar Hash SHA-256</h2>
+
+        <label>Selecciona archivo</label>
+
+        <input type="file" id="hash-file">
+
+        <button onclick="doHash()">
+            Calcular Hash
+        </button>
+
+        <div class="err" id="hash-err"></div>
+
+        <div class="result" id="hash-result">
+
+            <p><b>Archivo:</b></p>
+            <p id="hash-name"></p>
+
+            <br>
+
+            <p><b>SHA-256:</b></p>
+            <p class="ok" id="hash-value"></p>
+
+            <button class="copy-btn"
+            onclick="copyText('hash-value')">
+                Copiar Hash
+            </button>
+
+        </div>
+
+    </div>
+
+    <!-- SIGN -->
     <div class="card">
-      <div class="card-header">Firmar Documento con HMAC-SHA256</div>
-      <label>Mensaje o documento</label>
-      <textarea id="f-msg" placeholder="Texto del contrato, acuerdo o documento a firmar..."></textarea>
-      <label>Clave secreta (mínimo 6 caracteres)</label>
-      <input type="password" id="f-key" placeholder="Tu clave privada de firma..."/>
-      <button class="btn" id="f-btn" onclick="doFirmar()">Generar Firma Digital</button>
-      <div class="errmsg" id="f-err"></div>
-    </div>
-    <div class="result" id="f-res">
-      <div class="result-hdr">
-        <span class="result-hdr-label">Firma Generada</span>
-        <span class="badge badge-ok">Exitoso</span>
-      </div>
-      <div class="result-body">
-        <div class="rrow"><span class="rkey">Algoritmo</span><span class="rval info">HMAC-SHA256</span></div>
-        <div class="rrow" style="align-items:center">
-          <span class="rkey">Hash SHA-256</span>
-          <span class="rval" id="fr-hash" style="flex:1"></span>
-          <button class="copy-btn" onclick="copyText('fr-hash',this)">copiar</button>
-        </div>
-        <div class="rrow" style="align-items:center">
-          <span class="rkey">Firma HMAC</span>
-          <span class="rval ok" id="fr-firma" style="flex:1"></span>
-          <button class="copy-btn" onclick="copyText('fr-firma',this)">copiar</button>
-        </div>
-        <div class="rrow"><span class="rkey">Timestamp</span><span class="rval" id="fr-ts"></span></div>
-      </div>
-    </div>
-    <div class="infobox"><b>¿Qué es HMAC?</b><br/>Hash-based Message Authentication Code — combina el mensaje con una clave secreta para producir una firma única. Solo quien posee la clave puede generarla o verificarla.</div>
-  </div>
 
-  <!-- ── VERIFICAR ── -->
-  <div id="panel-verificar" class="panel">
+        <h2>✍️ Generar Firma HMAC</h2>
+
+        <label>Archivo</label>
+
+        <input type="file" id="sign-file">
+
+        <label>Clave secreta</label>
+
+        <input type="password"
+        id="sign-key"
+        placeholder="Clave secreta">
+
+        <button onclick="doSign()">
+            Firmar Archivo
+        </button>
+
+        <div class="err" id="sign-err"></div>
+
+        <div class="result" id="sign-result">
+
+            <p><b>Firma HMAC:</b></p>
+
+            <p class="ok" id="sign-value"></p>
+
+            <button class="copy-btn"
+            onclick="copyText('sign-value')">
+                Copiar Firma
+            </button>
+
+        </div>
+
+    </div>
+
+    <!-- VERIFY -->
     <div class="card">
-      <div class="card-header">Verificar Autenticidad e Integridad</div>
-      <label>Mensaje original</label>
-      <textarea id="v-msg" placeholder="Texto exacto del documento que fue firmado..."></textarea>
-      <label>Clave secreta</label>
-      <input type="password" id="v-key" placeholder="La misma clave usada al firmar..."/>
-      <label>Firma HMAC a verificar</label>
-      <input type="text" id="v-firma" placeholder="Pega aquí la firma HMAC generada..."/>
-      <button class="btn" id="v-btn" onclick="doVerificar()">Verificar Firma</button>
-      <div class="errmsg" id="v-err"></div>
-    </div>
-    <div class="result" id="v-res">
-      <div class="result-hdr">
-        <span class="result-hdr-label">Resultado de Verificación</span>
-        <span class="badge" id="v-badge"></span>
-      </div>
-      <div class="result-body">
-        <div id="v-verdict"></div>
-        <div class="rrow"><span class="rkey">Integridad</span><span class="rval" id="vr-int"></span></div>
-        <div class="rrow"><span class="rkey">Autenticidad</span><span class="rval" id="vr-aut"></span></div>
-        <div class="rrow" style="align-items:center">
-          <span class="rkey">Firma recibida</span>
-          <span class="rval" id="vr-rec" style="flex:1;font-size:.72rem"></span>
-          <button class="copy-btn" onclick="copyText('vr-rec',this)">copiar</button>
-        </div>
-        <div class="rrow">
-          <span class="rkey">Firma calculada</span>
-          <span class="rval" id="vr-calc" style="font-size:.72rem"></span>
-        </div>
-        <div class="rrow"><span class="rkey">Verificado</span><span class="rval" id="vr-ts"></span></div>
-      </div>
-    </div>
-  </div>
-</main>
 
-<footer>
-  HashSign · Validador de Firmas Digitales · Derecho Informático<br/>
-  <span style="color:#334">Guillermo &nbsp;·&nbsp; Samuel Sebastián &nbsp;·&nbsp; Henry Chiroy</span>
-</footer>
+        <h2>✅ Verificar Integridad</h2>
+
+        <label>Archivo original</label>
+
+        <input type="file" id="verify-file">
+
+        <label>Clave secreta</label>
+
+        <input type="password"
+        id="verify-key">
+
+        <label>Firma HMAC</label>
+
+        <input type="text"
+        id="verify-signature"
+        placeholder="Pega la firma">
+
+        <button onclick="doVerify()">
+            Verificar Firma
+        </button>
+
+        <div class="err" id="verify-err"></div>
+
+        <div class="result" id="verify-result">
+
+            <p id="verify-status"></p>
+
+            <br>
+
+            <p><b>Firma calculada:</b></p>
+
+            <p id="verify-calculated"></p>
+
+        </div>
+
+    </div>
+
+    <div class="footer">
+        HashSign © 2026 — Cyber Crypto Interface
+    </div>
+
+</div>
 
 <script>
-// ── TABS ──
-function switchTab(name, el) {
-  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-  document.getElementById('panel-' + name).classList.add('active');
-  el.classList.add('active');
+
+/* ========================= */
+/* FONDO ANIMADO */
+/* ========================= */
+
+const canvas = document.getElementById('bg');
+const ctx = canvas.getContext('2d');
+
+canvas.width = innerWidth;
+canvas.height = innerHeight;
+
+let particles = [];
+
+for(let i=0;i<120;i++){
+
+    particles.push({
+        x:Math.random()*canvas.width,
+        y:Math.random()*canvas.height,
+        r:Math.random()*2,
+        dx:(Math.random()-.5)*0.7,
+        dy:(Math.random()-.5)*0.7
+    });
+
 }
 
-// ── ALGO ──
-let currentAlgo = 'SHA-256';
-function setAlgo(btn, val) {
-  document.querySelectorAll('.algo-btn').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  currentAlgo = val;
+function animate(){
+
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+
+    particles.forEach(p=>{
+
+        p.x += p.dx;
+        p.y += p.dy;
+
+        if(p.x<0||p.x>canvas.width) p.dx*=-1;
+        if(p.y<0||p.y>canvas.height) p.dy*=-1;
+
+        ctx.beginPath();
+        ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+        ctx.fillStyle='rgba(0,255,179,.7)';
+        ctx.fill();
+
+    });
+
+    requestAnimationFrame(animate);
+
 }
 
-// ── COPY ──
-function copyText(id, btn) {
-  navigator.clipboard.writeText(document.getElementById(id).textContent).then(() => {
-    btn.textContent = '✓ copiado';
-    setTimeout(() => btn.textContent = 'copiar', 1600);
-  });
+animate();
+
+/* ========================= */
+/* UTILIDADES */
+/* ========================= */
+
+function toHex(buffer){
+
+    return [...new Uint8Array(buffer)]
+    .map(b=>b.toString(16).padStart(2,'0'))
+    .join('');
+
 }
 
-// ── ERROR ──
-function showErr(id, msg) {
-  const e = document.getElementById(id);
-  e.textContent = msg ? '⚠ ' + msg : '';
-  e.className = 'errmsg' + (msg ? ' show' : '');
+async function fileBuffer(file){
+
+    return await file.arrayBuffer();
+
 }
 
-// ── LOADING ──
-function setLoad(btn, on, original) {
-  btn.disabled = on;
-  btn.innerHTML = on ? '<span class="spin"></span>Procesando...' : original;
+function copyText(id){
+
+    navigator.clipboard.writeText(
+        document.getElementById(id).textContent
+    );
+
 }
 
-// ── CRYPTO ──
-async function sha256(msg) {
-  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(msg));
-  return [...new Uint8Array(buf)].map(b => b.toString(16).padStart(2,'0')).join('');
-}
-async function sha512(msg) {
-  const buf = await crypto.subtle.digest('SHA-512', new TextEncoder().encode(msg));
-  return [...new Uint8Array(buf)].map(b => b.toString(16).padStart(2,'0')).join('');
-}
-async function hmacSha256(msg, key) {
-  const enc = new TextEncoder();
-  const k   = await crypto.subtle.importKey('raw', enc.encode(key), {name:'HMAC',hash:'SHA-256'}, false, ['sign']);
-  const sig  = await crypto.subtle.sign('HMAC', k, enc.encode(msg));
-  return [...new Uint8Array(sig)].map(b => b.toString(16).padStart(2,'0')).join('');
+/* ========================= */
+/* SHA256 */
+/* ========================= */
+
+async function sha256(buffer){
+
+    const hash = await crypto.subtle.digest(
+        'SHA-256',
+        buffer
+    );
+
+    return toHex(hash);
+
 }
 
-// ── HASH ──
-async function doHash() {
-  showErr('h-err', '');
-  const msg = document.getElementById('h-msg').value.trim();
-  if (!msg) { showErr('h-err', 'Escribe un mensaje para hashear.'); return; }
-  const btn = document.getElementById('h-btn');
-  const orig = btn.innerHTML;
-  setLoad(btn, true);
-  try {
-    const hash = currentAlgo === 'SHA-256' ? await sha256(msg) : await sha512(msg);
-    document.getElementById('hr-algo').textContent = currentAlgo;
-    document.getElementById('hr-bits').textContent = currentAlgo === 'SHA-256' ? '256 bits' : '512 bits';
-    document.getElementById('hr-hash').textContent = hash;
-    document.getElementById('hr-ts').textContent   = new Date().toLocaleString('es-GT');
-    document.getElementById('h-res').classList.add('show');
-  } finally { setLoad(btn, false, orig); }
+/* ========================= */
+/* HMAC */
+/* ========================= */
+
+async function hmac(buffer,key){
+
+    const enc = new TextEncoder();
+
+    const cryptoKey =
+    await crypto.subtle.importKey(
+        'raw',
+        enc.encode(key),
+        {
+            name:'HMAC',
+            hash:'SHA-256'
+        },
+        false,
+        ['sign']
+    );
+
+    const sig = await crypto.subtle.sign(
+        'HMAC',
+        cryptoKey,
+        buffer
+    );
+
+    return toHex(sig);
+
 }
 
-// ── FIRMAR ──
-async function doFirmar() {
-  showErr('f-err', '');
-  const msg = document.getElementById('f-msg').value.trim();
-  const key = document.getElementById('f-key').value;
-  if (!msg) { showErr('f-err', 'Escribe el documento a firmar.'); return; }
-  if (key.length < 6) { showErr('f-err', 'La clave debe tener mínimo 6 caracteres.'); return; }
-  const btn = document.getElementById('f-btn');
-  const orig = btn.innerHTML;
-  setLoad(btn, true);
-  try {
-    const hash  = await sha256(msg);
-    const firma = await hmacSha256(msg, key);
-    document.getElementById('fr-hash').textContent  = hash;
-    document.getElementById('fr-firma').textContent = firma;
-    document.getElementById('fr-ts').textContent    = new Date().toLocaleString('es-GT');
-    document.getElementById('f-res').classList.add('show');
-  } finally { setLoad(btn, false, orig); }
+/* ========================= */
+/* HASH */
+/* ========================= */
+
+async function doHash(){
+
+    const input =
+    document.getElementById('hash-file');
+
+    if(!input.files.length){
+
+        document.getElementById('hash-err')
+        .textContent='Selecciona un archivo';
+
+        return;
+    }
+
+    const file = input.files[0];
+
+    const hash =
+    await sha256(await fileBuffer(file));
+
+    document.getElementById('hash-name')
+    .textContent=file.name;
+
+    document.getElementById('hash-value')
+    .textContent=hash;
+
+    document.getElementById('hash-result')
+    .classList.add('show');
+
 }
 
-// ── VERIFICAR ──
-async function doVerificar() {
-  showErr('v-err', '');
-  const msg   = document.getElementById('v-msg').value.trim();
-  const key   = document.getElementById('v-key').value;
-  const firma = document.getElementById('v-firma').value.trim();
-  if (!msg)   { showErr('v-err', 'Escribe el mensaje original.'); return; }
-  if (!key)   { showErr('v-err', 'Ingresa la clave secreta.'); return; }
-  if (!firma) { showErr('v-err', 'Pega la firma HMAC a verificar.'); return; }
-  const btn = document.getElementById('v-btn');
-  const orig = btn.innerHTML;
-  setLoad(btn, true);
-  try {
-    const calc = await hmacSha256(msg, key);
-    const ok   = calc === firma;
-    const badge = document.getElementById('v-badge');
-    badge.textContent = ok ? 'Válida' : 'Inválida';
-    badge.className   = 'badge ' + (ok ? 'badge-ok' : 'badge-fail');
-    document.getElementById('v-verdict').innerHTML =
-      `<div class="verdict ${ok?'ok':'fail'}">
-        <span class="verdict-icon">${ok ? '✅' : '❌'}</span>
-        <span class="verdict-text">${ok
-          ? 'Firma VÁLIDA — el documento es auténtico e íntegro.'
-          : 'Firma INVÁLIDA — el documento fue alterado o la clave es incorrecta.'}</span>
-      </div>`;
-    const cls = ok ? 'rval ok' : 'rval fail';
-    document.getElementById('vr-int').textContent  = ok ? '✅ Documento íntegro' : '❌ Posiblemente alterado';
-    document.getElementById('vr-int').className    = cls;
-    document.getElementById('vr-aut').textContent  = ok ? '✅ Firma auténtica'   : '❌ No verificado';
-    document.getElementById('vr-aut').className    = cls;
-    document.getElementById('vr-rec').textContent  = firma;
-    document.getElementById('vr-calc').textContent = calc;
-    document.getElementById('vr-ts').textContent   = new Date().toLocaleString('es-GT');
-    document.getElementById('v-res').classList.add('show');
-  } finally { setLoad(btn, false, orig); }
+/* ========================= */
+/* SIGN */
+/* ========================= */
+
+async function doSign(){
+
+    const fileInput =
+    document.getElementById('sign-file');
+
+    const key =
+    document.getElementById('sign-key')
+    .value;
+
+    if(!fileInput.files.length){
+
+        document.getElementById('sign-err')
+        .textContent='Selecciona archivo';
+
+        return;
+    }
+
+    if(key.length < 6){
+
+        document.getElementById('sign-err')
+        .textContent='Clave mínima 6 caracteres';
+
+        return;
+    }
+
+    const file = fileInput.files[0];
+
+    const sig =
+    await hmac(
+        await fileBuffer(file),
+        key
+    );
+
+    document.getElementById('sign-value')
+    .textContent=sig;
+
+    document.getElementById('sign-result')
+    .classList.add('show');
+
 }
+
+/* ========================= */
+/* VERIFY */
+/* ========================= */
+
+async function doVerify(){
+
+    const fileInput =
+    document.getElementById('verify-file');
+
+    const key =
+    document.getElementById('verify-key')
+    .value;
+
+    const signature =
+    document.getElementById('verify-signature')
+    .value.trim();
+
+    if(!fileInput.files.length){
+
+        document.getElementById('verify-err')
+        .textContent='Selecciona archivo';
+
+        return;
+    }
+
+    const file = fileInput.files[0];
+
+    const calc =
+    await hmac(
+        await fileBuffer(file),
+        key
+    );
+
+    const ok = calc === signature;
+
+    document.getElementById('verify-status')
+    .innerHTML =
+        ok
+        ? '<span class="ok">✅ Archivo íntegro</span>'
+        : '<span class="fail">❌ Archivo alterado</span>';
+
+    document.getElementById('verify-calculated')
+    .textContent=calc;
+
+    document.getElementById('verify-result')
+    .classList.add('show');
+
+}
+
 </script>
+
 </body>
 </html>
