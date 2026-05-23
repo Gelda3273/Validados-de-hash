@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>HashSign Neon Edition</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;800&family=Rajdhani:wght@300;500;700&display=swap" rel="stylesheet">
+
+<style>
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+:root{
+    --bg:#050816;
+    --panel:#0d1326;
+    --panel2:#111935;
+    --accent:#00ffb3;
+    --blue:#4da3ff;
+    --danger:#ff4d6d;
+    --text:#eef3ff;
+    --muted:#7d8bb3;
+    --border:#1f2b4d;
+}
+
+body{
+    min-height:100vh;
+    background:
+        radial-gradient(circle at top,#13203f 0%,#050816 60%);
+    color:var(--text);
+    font-family:'Rajdhani',sans-serif;
+    overflow-x:hidden;
+}
+
+canvas{
+    position:fixed;
+    inset:0;
+    z-index:-1;
+}
+
+.container{
+    max-width:900px;
+    margin:auto;
+    padding:40px 20px;
+}
+
+.title{
+    text-align:center;
+    margin-bottom:40px;
+}
+
+.title h1{
+    font-family:'Orbitron',sans-serif;
+    font-size:4rem;
+    letter-spacing:4px;
+    color:white;
+    text-shadow:
+        0 0 10px var(--accent),
+        0 0 30px var(--accent);
+}
+
+.title span{
+    color:var(--accent);
+}
+
+.title p{
+    margin-top:10px;
+    color:var(--muted);
+    font-size:1.2rem;
+}
+
+.card{
+    background:rgba(13,19,38,.75);
+    border:1px solid var(--border);
+    backdrop-filter:blur(15px);
+    border-radius:22px;
+    padding:28px;
+    margin-bottom:25px;
+    box-shadow:
+        0 0 20px rgba(0,255,179,.08);
+}
+
+.card h2{
+    margin-bottom:20px;
+    color:var(--accent);
+    font-size:1.7rem;
+}
+
+label{
+    display:block;
+    margin:18px 0 8px;
+    color:var(--muted);
+    font-size:.95rem;
+}
+
+input{
+    width:100%;
+    padding:15px;
+    border-radius:14px;
+    border:1px solid var(--border);
+    background:#07101f;
+    color:white;
+    font-size:1rem;
+    outline:none;
+    transition:.3s;
+}
+
+input:focus{
+    border-color:var(--accent);
+    box-shadow:0 0 15px rgba(0,255,179,.3);
+}
+
+button{
+    width:100%;
+    margin-top:20px;
+    padding:15px;
+    border:none;
+    border-radius:14px;
+    cursor:pointer;
+    background:
+        linear-gradient(135deg,var(--accent),#00d494);
+    color:#03140f;
+    font-weight:bold;
+    font-size:1rem;
+    transition:.3s;
+}
+
+button:hover{
+    transform:translateY(-2px);
+    box-shadow:
+        0 0 20px rgba(0,255,179,.4);
+}
+
+.result{
+    margin-top:20px;
+    padding:20px;
+    border-radius:14px;
+    background:#050b16;
+    border:1px solid var(--border);
+    display:none;
+    word-break:break-word;
+}
+
+.result.show{
+    display:block;
+    animation:fade .5s ease;
+}
+
+@keyframes fade{
+    from{
+        opacity:0;
+        transform:translateY(10px);
+    }
+    to{
+        opacity:1;
+        transform:translateY(0);
+    }
+}
+
+.ok{
+    color:var(--accent);
+}
+
+.fail{
+    color:var(--danger);
+}
+
+.copy-btn{
+    margin-top:15px;
+    background:var(--panel2);
+    color:white;
+}
+
+.err{
+    margin-top:10px;
+    color:var(--danger);
+}
+
+.footer{
+    text-align:center;
+    margin-top:30px;
+    color:var(--muted);
+}
+
+</style>
+</head>
+
+<body>
+
+<canvas id="bg"></canvas>
+
+<div class="container">
+
+    <div class="title">
+        <h1>Hash<span>Sign</span></h1>
+        <p>Validador de Integridad y Firma Criptográfica</p>
+    </div>
+
+    <!-- HASH -->
+    <div class="card">
+
+        <h2>🔐 Generar Hash SHA-256</h2>
+
+        <label>Selecciona archivo</label>
+
+        <input type="file" id="hash-file">
+
+        <button onclick="doHash()">
+            Calcular Hash
+        </button>
+
+        <div class="err" id="hash-err"></div>
+
+        <div class="result" id="hash-result">
+
+            <p><b>Archivo:</b></p>
+            <p id="hash-name"></p>
+
+            <br>
+
+            <p><b>SHA-256:</b></p>
+            <p class="ok" id="hash-value"></p>
+
+            <button class="copy-btn"
+            onclick="copyText('hash-value')">
+                Copiar Hash
+            </button>
+
+        </div>
+
+    </div>
+
+    <!-- SIGN -->
+    <div class="card">
+
+        <h2>✍️ Generar Firma HMAC</h2>
+
+        <label>Archivo</label>
+
+        <input type="file" id="sign-file">
+
+        <label>Clave secreta</label>
+
+        <input type="password"
+        id="sign-key"
+        placeholder="Clave secreta">
+
+        <button onclick="doSign()">
+            Firmar Archivo
+        </button>
+
+        <div class="err" id="sign-err"></div>
+
+        <div class="result" id="sign-result">
+
+            <p><b>Firma HMAC:</b></p>
+
+            <p class="ok" id="sign-value"></p>
+
+            <button class="copy-btn"
+            onclick="copyText('sign-value')">
+                Copiar Firma
+            </button>
+
+        </div>
+
+    </div>
+
+    <!-- VERIFY -->
+    <div class="card">
+
+        <h2>✅ Verificar Integridad</h2>
+
+        <label>Archivo original</label>
+
+        <input type="file" id="verify-file">
+
+        <label>Clave secreta</label>
+
+        <input type="password"
+        id="verify-key">
+
+        <label>Firma HMAC</label>
+
+        <input type="text"
+        id="verify-signature"
+        placeholder="Pega la firma">
+
+        <button onclick="doVerify()">
+            Verificar Firma
+        </button>
+
+        <div class="err" id="verify-err"></div>
+
+        <div class="result" id="verify-result">
+
+            <p id="verify-status"></p>
+
+            <br>
+
+            <p><b>Firma calculada:</b></p>
+
+            <p id="verify-calculated"></p>
+
+        </div>
+
+    </div>
+
+    <div class="footer">
+        HashSign © 2026 — Cyber Crypto Interface
+    </div>
+
+</div>
+
+<script>
+
+/* ========================= */
+/* FONDO ANIMADO */
+/* ========================= */
+
+const canvas = document.getElementById('bg');
+const ctx = canvas.getContext('2d');
+
+canvas.width = innerWidth;
+canvas.height = innerHeight;
+
+let particles = [];
+
+for(let i=0;i<120;i++){
+
+    particles.push({
+        x:Math.random()*canvas.width,
+        y:Math.random()*canvas.height,
+        r:Math.random()*2,
+        dx:(Math.random()-.5)*0.7,
+        dy:(Math.random()-.5)*0.7
+    });
+
+}
+
+function animate(){
+
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+
+    particles.forEach(p=>{
+
+        p.x += p.dx;
+        p.y += p.dy;
+
+        if(p.x<0||p.x>canvas.width) p.dx*=-1;
+        if(p.y<0||p.y>canvas.height) p.dy*=-1;
+
+        ctx.beginPath();
+        ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+        ctx.fillStyle='rgba(0,255,179,.7)';
+        ctx.fill();
+
+    });
+
+    requestAnimationFrame(animate);
+
+}
+
+animate();
+
+/* ========================= */
+/* UTILIDADES */
+/* ========================= */
+
+function toHex(buffer){
+
+    return [...new Uint8Array(buffer)]
+    .map(b=>b.toString(16).padStart(2,'0'))
+    .join('');
+
+}
+
+async function fileBuffer(file){
+
+    return await file.arrayBuffer();
+
+}
+
+function copyText(id){
+
+    navigator.clipboard.writeText(
+        document.getElementById(id).textContent
+    );
+
+}
+
+/* ========================= */
+/* SHA256 */
+/* ========================= */
+
+async function sha256(buffer){
+
+    const hash = await crypto.subtle.digest(
+        'SHA-256',
+        buffer
+    );
+
+    return toHex(hash);
+
+}
+
+/* ========================= */
+/* HMAC */
+/* ========================= */
+
+async function hmac(buffer,key){
+
+    const enc = new TextEncoder();
+
+    const cryptoKey =
+    await crypto.subtle.importKey(
+        'raw',
+        enc.encode(key),
+        {
+            name:'HMAC',
+            hash:'SHA-256'
+        },
+        false,
+        ['sign']
+    );
+
+    const sig = await crypto.subtle.sign(
+        'HMAC',
+        cryptoKey,
+        buffer
+    );
+
+    return toHex(sig);
+
+}
+
+/* ========================= */
+/* HASH */
+/* ========================= */
+
+async function doHash(){
+
+    const input =
+    document.getElementById('hash-file');
+
+    if(!input.files.length){
+
+        document.getElementById('hash-err')
+        .textContent='Selecciona un archivo';
+
+        return;
+    }
+
+    const file = input.files[0];
+
+    const hash =
+    await sha256(await fileBuffer(file));
+
+    document.getElementById('hash-name')
+    .textContent=file.name;
+
+    document.getElementById('hash-value')
+    .textContent=hash;
+
+    document.getElementById('hash-result')
+    .classList.add('show');
+
+}
+
+/* ========================= */
+/* SIGN */
+/* ========================= */
+
+async function doSign(){
+
+    const fileInput =
+    document.getElementById('sign-file');
+
+    const key =
+    document.getElementById('sign-key')
+    .value;
+
+    if(!fileInput.files.length){
+
+        document.getElementById('sign-err')
+        .textContent='Selecciona archivo';
+
+        return;
+    }
+
+    if(key.length < 6){
+
+        document.getElementById('sign-err')
+        .textContent='Clave mínima 6 caracteres';
+
+        return;
+    }
+
+    const file = fileInput.files[0];
+
+    const sig =
+    await hmac(
+        await fileBuffer(file),
+        key
+    );
+
+    document.getElementById('sign-value')
+    .textContent=sig;
+
+    document.getElementById('sign-result')
+    .classList.add('show');
+
+}
+
+/* ========================= */
+/* VERIFY */
+/* ========================= */
+
+async function doVerify(){
+
+    const fileInput =
+    document.getElementById('verify-file');
+
+    const key =
+    document.getElementById('verify-key')
+    .value;
+
+    const signature =
+    document.getElementById('verify-signature')
+    .value.trim();
+
+    if(!fileInput.files.length){
+
+        document.getElementById('verify-err')
+        .textContent='Selecciona archivo';
+
+        return;
+    }
+
+    const file = fileInput.files[0];
+
+    const calc =
+    await hmac(
+        await fileBuffer(file),
+        key
+    );
+
+    const ok = calc === signature;
+
+    document.getElementById('verify-status')
+    .innerHTML =
+        ok
+        ? '<span class="ok">✅ Archivo íntegro</span>'
+        : '<span class="fail">❌ Archivo alterado</span>';
+
+    document.getElementById('verify-calculated')
+    .textContent=calc;
+
+    document.getElementById('verify-result')
+    .classList.add('show');
+
+}
+
+</script>
+
+</body>
+</html>
